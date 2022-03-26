@@ -159,7 +159,7 @@ TABLE;
         echo <<<wiersz
 <tr>
     <td>$row[id]</td>
-    <td>$row[imie]</td>
+    <td><a href="./uczen_panel.php?id=$row[id]">$row[imie]</a></td>
     <td>$row[nazwisko]</td>
     <td>$row[data_urodzenia]</td>
     <td>$row[email]</td>

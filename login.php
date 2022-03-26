@@ -38,12 +38,12 @@ zal;
                 session_start();
                 $_SESSION['user'] = $row['id'];
                 $_SESSION['user_name'] = $row['imie'];
+                $_SESSION['user_typ'] = $row['typ'];
                 $connect->close();
                 header("location:admin_panel.php");
             } else {
                 echo "błędne hasło";
             }
-            
         }
         $connect->close();
     }
