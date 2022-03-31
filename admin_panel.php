@@ -73,6 +73,7 @@ wiersz;
         if (isset($_POST["zatwierdz"])) {
             if (empty($_POST['imie']) || empty($_POST['nazwisko']) || empty($_POST['data_urodzenia']) || empty($_POST['haslo']) || empty($_POST['email'])) {
                 $czy = true;
+                
                 $imie = $_POST['imie'];
                 $nazwisko = $_POST['nazwisko'];
                 $data_urodzenia = $_POST['data_urodzenia'];
