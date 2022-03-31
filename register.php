@@ -12,13 +12,17 @@
     <h1>REJESTRACJA</h1>
 
     <?php
+    // Regex
     $imie = "";
+    $imie_pattern = "/^[A-Z]{1}[A-Za-z]{1,29}$/m";
     $nazwisko = "";
+    $nazwisko_pattern = "/^[A-Z]{1}[A-Za-z]{1,29}$/m";
     $data_urodzenia = "";
     $email = "";
+    $email_pattern = "/^[a-z0-9._-]{1,28}@[a-z.]{1,10}.[a-z]{1,3}$/m";
     $czy = false;
     if (isset($_POST["zatwierdz"])) {
-        if (empty($_POST['imie']) || empty($_POST['nazwisko']) || empty($_POST['data_urodzenia']) || empty($_POST['haslo']) || empty($_POST['email'])) {
+        if (!preg_match($imie_pattern, $_POST['imie']) || !preg_match($nazwisko_pattern, $_POST['nazwisko']) || empty($_POST['data_urodzenia']) || empty($_POST['haslo']) || !preg_match($email_pattern, $_POST['email'])) {
             $czy = true;
             $imie = $_POST['imie'];
             $nazwisko = $_POST['nazwisko'];
@@ -55,7 +59,12 @@
     </form>
 FORM1;
     if ($czy) {
-        echo "Wypełnij wszystkie pola!!!";
+        echo <<<POLA
+        Wypełnij poprawnie wszystkie pola!!!<br>
+        Imię - Zaczynamy wielką literą<br>
+        Nazwisko - zaczynamy wielką literą<br>
+        E-mail - może zawierać literki, cyferki oraz znaki "._-"<br>
+POLA;
     }
     ?>
 </body>
