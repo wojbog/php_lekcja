@@ -1,13 +1,9 @@
 <?php
 session_start();
-if (isset($_SESSION['user'])) {
-    echo "zalogowano";
-    echo "<h1>Witaj " . $_SESSION['user_name'] . "</h1>";
+if (isset($_SESSION['user']) && isset($_SESSION['user_typ']) && $_SESSION['user_typ'] == "admin") {
 } else {
-    echo "włamanie";
     header("location: ./index.php");
 }
-echo '<a href="./script/logout.php">Wyloguj</a>';
 
 ?>
 <!DOCTYPE html>
@@ -22,19 +18,34 @@ echo '<a href="./script/logout.php">Wyloguj</a>';
 </head>
 
 <body>
-    <?php
+    <header>
+        <?php
+        echo "<h1>Witaj " . $_SESSION['user_name'] . "</h1>";
+        ?>
+        <a href="./nau_panel.php">
+            <div class="guzik">
+                Panel nauczyciela
+            </div>
+        </a>
+        <a href="./script/logout.php">
+            <div class="guzik">Wyloguj</div>
+        </a>
+    </header>
+    <main>
+        <div class="contener">
+            <?php
 
-    if (isset($_GET['err'])) {
-        echo "<h1>" . $_GET['err'] . "</h1>";
-    }
-    ?>
-    <h1>Nauczyciele</h1>
+            if (isset($_GET['err'])) {
+                echo "<h1>" . $_GET['err'] . "</h1>";
+            }
+            ?>
+            <h1>Nauczyciele</h1>
 
-    <?php
-    $connect = new Mysqli("localhost", "root", "", "dziennik");
-    $sql = "SELECT * FROM `user` WHERE typ like 'nauczyciel';";
-    $result = $connect->query($sql);
-    echo <<<TABLE
+            <?php
+            $connect = new Mysqli("localhost", "root", "", "dziennik");
+            $sql = "SELECT * FROM `user` WHERE typ like 'nauczyciel';";
+            $result = $connect->query($sql);
+            echo <<<TABLE
 <table>
 <tr>
     <th>id</th>
@@ -46,8 +57,8 @@ echo '<a href="./script/logout.php">Wyloguj</a>';
     <th></th>
 </th>
 TABLE;
-    while ($row = $result->fetch_assoc()) {
-        echo <<<wiersz
+            while ($row = $result->fetch_assoc()) {
+                echo <<<wiersz
 <tr>
     <td>$row[id]</td>
     <td>$row[imie]</td>
@@ -58,41 +69,43 @@ TABLE;
     <td><a href="./admin_panel.php?aktu_nau=$row[id]">aktualizuj</a></td>
 </tr>
 wiersz;
-    }
-    echo "</table>";
-    $connect->close();
-    ?>
-    <a href="./admin_panel.php?dodaj_nau=true">Dodaj nauczyciela</a>
-    <?php
-    if (isset($_GET['dodaj_nau'])) {
-        $imie = "";
-        $nazwisko = "";
-        $data_urodzenia = "";
-        $email = "";
-        $czy = 0;
-        if (isset($_POST["zatwierdz"])) {
-            if (empty($_POST['imie']) || empty($_POST['nazwisko']) || empty($_POST['data_urodzenia']) || empty($_POST['haslo']) || empty($_POST['email'])) {
-                $czy = true;
-                
-                $imie = $_POST['imie'];
-                $nazwisko = $_POST['nazwisko'];
-                $data_urodzenia = $_POST['data_urodzenia'];
-                $email = $_POST['email'];
-            } else {
-                $connect = new mysqli("localhost", "root", "", "dziennik");
-                $pass = password_hash($_POST['haslo'], PASSWORD_DEFAULT);
-                $sql = "INSERT INTO `user`(`imie`, `nazwisko`, `data_urodzenia`, `haslo`, `email`,`typ`) VALUES ('$_POST[imie]','$_POST[nazwisko]','$_POST[data_urodzenia]','$pass','$_POST[email]','nauczyciel');";
-                $result = $connect->query($sql);
-                if ($connect->affected_rows) {
-                    echo "Dodano użytkownika<br>";
-                    $czy = 2;
-                } else {
-                    echo "Nie dodano użytkownika<br>Spróbuj ponownie później!!!";
-                }
-                $connect->close();
             }
-        }
-        echo <<<FORM1
+            echo "</table>";
+            $connect->close();
+            ?>
+            <a href="./admin_panel.php?dodaj_nau=true">
+                <div class="guzik">Dodaj nauczyciela</div>
+            </a>
+            <?php
+            if (isset($_GET['dodaj_nau'])) {
+                $imie = "";
+                $nazwisko = "";
+                $data_urodzenia = "";
+                $email = "";
+                $czy = 0;
+                if (isset($_POST["zatwierdz"])) {
+                    if (empty($_POST['imie']) || empty($_POST['nazwisko']) || empty($_POST['data_urodzenia']) || empty($_POST['haslo']) || empty($_POST['email'])) {
+                        $czy = true;
+
+                        $imie = $_POST['imie'];
+                        $nazwisko = $_POST['nazwisko'];
+                        $data_urodzenia = $_POST['data_urodzenia'];
+                        $email = $_POST['email'];
+                    } else {
+                        $connect = new mysqli("localhost", "root", "", "dziennik");
+                        $pass = password_hash($_POST['haslo'], PASSWORD_DEFAULT);
+                        $sql = "INSERT INTO `user`(`imie`, `nazwisko`, `data_urodzenia`, `haslo`, `email`,`typ`) VALUES ('$_POST[imie]','$_POST[nazwisko]','$_POST[data_urodzenia]','$pass','$_POST[email]','nauczyciel');";
+                        $result = $connect->query($sql);
+                        if ($connect->affected_rows) {
+                            echo "Dodano użytkownika<br>";
+                            $czy = 2;
+                        } else {
+                            echo "Nie dodano użytkownika<br>Spróbuj ponownie później!!!";
+                        }
+                        $connect->close();
+                    }
+                }
+                echo <<<FORM1
     <form name="" method="post">
         <label>Podaj imę: </label><br>
         <input type="text" name="imie" placeholder="Podaje imie" value='$imie'><br>
@@ -107,22 +120,22 @@ wiersz;
         <input type="submit" name="zatwierdz" value="Zatwierdź"><br>
     </form>
 FORM1;
-        if ($czy) {
-            echo "Wypełnij wszystkie pola!!!";
-        } else if ($czy == 2) {
-            echo "Dodano nauczyciela!<br>";
-        }
-    }
-    if (isset($_GET['aktu_nau'])) {
-        $connect = new mysqli("localhost", "root", "", "dziennik");
-        $sql = "SELECT * FROM `user` WHERE `id`=$_GET[aktu_nau];";
-        $result = $connect->query($sql);
-        $row = $result->fetch_assoc();
-        $imie = $row['imie'];
-        $nazwisko = $row['nazwisko'];
-        $data_urodzenia = $row['data_urodzenia'];
-        $email = $row['email'];
-        echo <<<FORM1
+                if ($czy) {
+                    echo "Wypełnij wszystkie pola!!!";
+                } else if ($czy == 2) {
+                    echo "Dodano nauczyciela!<br>";
+                }
+            }
+            if (isset($_GET['aktu_nau'])) {
+                $connect = new mysqli("localhost", "root", "", "dziennik");
+                $sql = "SELECT * FROM `user` WHERE `id`=$_GET[aktu_nau];";
+                $result = $connect->query($sql);
+                $row = $result->fetch_assoc();
+                $imie = $row['imie'];
+                $nazwisko = $row['nazwisko'];
+                $data_urodzenia = $row['data_urodzenia'];
+                $email = $row['email'];
+                echo <<<FORM1
         <form action="./script/aktualizuj.php?id=$_GET[aktu_nau]" method="post">
             <label>Podaj imę: </label><br>
             <input type="text" name="imie" placeholder="Podaje imie" value='$imie'><br>
@@ -135,16 +148,20 @@ FORM1;
             <input type="submit" name="aktualizuj" value="Aktualizuj"><br>
         </form>
     FORM1;
-        $connect->close();
-    }
-    ?>
+                $connect->close();
+            }
+            ?>
+        </div>
+        <br>
 
-    <h2>Uczniowie</h2>
-    <?php
-    $connect = new Mysqli("localhost", "root", "", "dziennik");
-    $sql = "SELECT * FROM `user` WHERE typ like 'uczen';";
-    $result = $connect->query($sql);
-    echo <<<TABLE
+        <br>
+        <div class="contener">
+            <h2>Uczniowie</h2>
+            <?php
+            $connect = new Mysqli("localhost", "root", "", "dziennik");
+            $sql = "SELECT * FROM `user` WHERE typ like 'uczen';";
+            $result = $connect->query($sql);
+            echo <<<TABLE
 <table>
 <tr>
     <th>id</th>
@@ -156,8 +173,8 @@ FORM1;
     <th></th>
 </th>
 TABLE;
-    while ($row = $result->fetch_assoc()) {
-        echo <<<wiersz
+            while ($row = $result->fetch_assoc()) {
+                echo <<<wiersz
 <tr>
     <td>$row[id]</td>
     <td><a href="./uczen_panel.php?id=$row[id]">$row[imie]</a></td>
@@ -168,41 +185,43 @@ TABLE;
     <td><a href="./admin_panel.php?aktu_uczen=$row[id]">aktualizuj</a></td>
 </tr>
 wiersz;
-    }
-    echo "</table>";
-    $connect->close();
-    ?>
-    <a href="./admin_panel.php?dodaj_uczen=true">Dodaj ucznia</a>
-    <?php
-    if (isset($_GET['dodaj_uczen'])) {
-        $imie_uczen = "";
-        $nazwisko_uczen = "";
-        $data_urodzenia_uczen = "";
-        $email_uczen = "";
-        $czy_uczen = 0;
-        if (isset($_POST["zatwierdz"])) {
-            if (empty($_POST['imie']) || empty($_POST['nazwisko']) || empty($_POST['data_urodzenia']) || empty($_POST['haslo']) || empty($_POST['email'])) {
-                $czy_uczen = true;
-                $imie_uczen = $_POST['imie'];
-                $nazwisko_uczen = $_POST['nazwisko'];
-                $data_urodzenia_uczen = $_POST['data_urodzenia'];
-                $email_uczen = $_POST['email'];
-            } else {
-                $connect = new mysqli("localhost", "root", "", "dziennik");
-                $pass = password_hash($_POST['haslo'], PASSWORD_DEFAULT);
-                $sql = "INSERT INTO `user`(`imie`, `nazwisko`, `data_urodzenia`, `haslo`, `email`,`typ`) VALUES ('$_POST[imie]','$_POST[nazwisko]','$_POST[data_urodzenia]','$pass','$_POST[email]','uczen');";
-                $result = $connect->query($sql);
-                if ($connect->affected_rows) {
-                    echo "Dodano użytkownika<br>";
-                    header("location: ./admin_panel.php");
-                    $czy = 2;
-                } else {
-                    echo "Nie dodano użytkownika<br>Spróbuj ponownie później!!!";
-                }
-                $connect->close();
             }
-        }
-        echo <<<FORM1
+            echo "</table>";
+            $connect->close();
+            ?>
+            <a href="./admin_panel.php?dodaj_uczen=true">
+                <div class="guzik">Dodaj ucznia</div>
+            </a>
+            <?php
+            if (isset($_GET['dodaj_uczen'])) {
+                $imie_uczen = "";
+                $nazwisko_uczen = "";
+                $data_urodzenia_uczen = "";
+                $email_uczen = "";
+                $czy_uczen = 0;
+                if (isset($_POST["zatwierdz"])) {
+                    if (empty($_POST['imie']) || empty($_POST['nazwisko']) || empty($_POST['data_urodzenia']) || empty($_POST['haslo']) || empty($_POST['email'])) {
+                        $czy_uczen = true;
+                        $imie_uczen = $_POST['imie'];
+                        $nazwisko_uczen = $_POST['nazwisko'];
+                        $data_urodzenia_uczen = $_POST['data_urodzenia'];
+                        $email_uczen = $_POST['email'];
+                    } else {
+                        $connect = new mysqli("localhost", "root", "", "dziennik");
+                        $pass = password_hash($_POST['haslo'], PASSWORD_DEFAULT);
+                        $sql = "INSERT INTO `user`(`imie`, `nazwisko`, `data_urodzenia`, `haslo`, `email`,`typ`) VALUES ('$_POST[imie]','$_POST[nazwisko]','$_POST[data_urodzenia]','$pass','$_POST[email]','uczen');";
+                        $result = $connect->query($sql);
+                        if ($connect->affected_rows) {
+                            echo "Dodano użytkownika<br>";
+                            header("location: ./admin_panel.php");
+                            $czy = 2;
+                        } else {
+                            echo "Nie dodano użytkownika<br>Spróbuj ponownie później!!!";
+                        }
+                        $connect->close();
+                    }
+                }
+                echo <<<FORM1
     <form name=""  method="post">
         <label>Podaj imę: </label><br>
         <input type="text" name="imie" placeholder="Podaje imie" value='$imie_uczen'><br>
@@ -217,22 +236,22 @@ wiersz;
         <input type="submit" name="zatwierdz" value="Zatwierdź"><br>
     </form>
 FORM1;
-        if ($czy_uczen) {
-            echo "Wypełnij wszystkie pola!!!";
-        } else if ($czy_uczen == 2) {
-            echo "Dodano ucznia!<br>";
-        }
-    }
-    if (isset($_GET['aktu_uczen'])) {
-        $connect = new mysqli("localhost", "root", "", "dziennik");
-        $sql = "SELECT * FROM `user` WHERE `id`=$_GET[aktu_uczen];";
-        $result = $connect->query($sql);
-        $row = $result->fetch_assoc();
-        $imie = $row['imie'];
-        $nazwisko = $row['nazwisko'];
-        $data_urodzenia = $row['data_urodzenia'];
-        $email = $row['email'];
-        echo <<<FORM1
+                if ($czy_uczen) {
+                    echo "Wypełnij wszystkie pola!!!";
+                } else if ($czy_uczen == 2) {
+                    echo "Dodano ucznia!<br>";
+                }
+            }
+            if (isset($_GET['aktu_uczen'])) {
+                $connect = new mysqli("localhost", "root", "", "dziennik");
+                $sql = "SELECT * FROM `user` WHERE `id`=$_GET[aktu_uczen];";
+                $result = $connect->query($sql);
+                $row = $result->fetch_assoc();
+                $imie = $row['imie'];
+                $nazwisko = $row['nazwisko'];
+                $data_urodzenia = $row['data_urodzenia'];
+                $email = $row['email'];
+                echo <<<FORM1
         <form action="./script/update.php?id=$_GET[aktu_uczen]" method="post">
             <label>Podaj imę: </label><br>
             <input type="text" name="imie" placeholder="Podaje imie" value='$imie'><br>
@@ -245,11 +264,14 @@ FORM1;
             <input type="submit" name="aktualizuj" value="Aktualizuj"><br>
         </form>
     FORM1;
-        $connect->close();
-    }
-    ?>
-
-
+                $connect->close();
+            }
+            ?>
+        </div>
+    </main>
+  <footer>
+      Pracę wykonał: Wojciech Bogacz 4c
+  </footer>
 </body>
 
 </html>

@@ -1,3 +1,9 @@
+body {
+    margin:0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
 table,
 th,
 td,
@@ -5,3 +11,60 @@ tr {
     border: 1px solid black;
     border-collapse: collapse;
 }
+
+header {
+    height: 100px;
+    width: 100%;
+    background-color: blanchedalmond;
+    display: flex;
+    padding: 15px;
+    justify-content: space-around;
+    align-items: center;
+}
+main {
+    height: 750px;
+    width: 100%;
+    background-color: beige;
+    display: flex;
+    justify-content: center;
+}
+header h1 {
+    margin: 0;
+}
+.guzik {
+    /* background-color: gray; */
+    border: 1px solid black;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+}
+.guzik:hover {
+    background-color: aqua;
+}
+
+footer {
+    height: 20%;
+    width: 100%;
+    background-color: blanchedalmond;
+    display: flex;
+    padding: 25px;
+    justify-content: center;
+}
+a {
+    text-decoration: none;
+}
+.contener {
+    margin: 50px;
+}
+table,td,th,tr{
+    border: 1px solid #0066ff ;
+    border-collapse: collapse;
+    padding: 6px;
+  }
+  th{
+    background-color: #0066ff;
+    color: white;
+  }
+  tr:nth-child(odd){
+    background-color: #EEF0EA;
+  }

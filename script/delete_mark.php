@@ -5,7 +5,7 @@ if (isset($_GET['id'])) {
     $sql = "DELETE FROM `oceny` WHERE id=$_GET[id];";
     $connect->query($sql);
     if ($connect->affected_rows) {
-        $err = "Usunęto ocenę";
+        $err = "Usunięto ocenę";
     }
 }
 header("location: ./../nau_panel.php?error=$err");
